@@ -272,7 +272,7 @@ Write-Output Installing apps "`n"
     # MobaXterm
 
         Write-Verbose -Message "Installing MobaXterm" -Verbose
-        choco install microsoft-windows-terminal-y --verbose -log-file=C:\logs\chocolatey\winterminallog.log
+        choco install mobaxterm --verbose -log-file=C:\logs\chocolatey\mobaxtermlog.log
         if ((Test-Path $MobaXtermPath) -eq $True) {
             Write-Output "MobaXterm successfully installed! Continuing installation.." "`n" | Green
         }
@@ -358,8 +358,8 @@ Write-Output Installing apps "`n"
 
 ## Update
 
-    Write-Output "Checking update"
-    choco update all
+    Write-Output "Checking update" | Green
+    choco update all -y
 
 
 Write-Host
