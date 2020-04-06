@@ -41,18 +41,15 @@ if ($isAdmin -eq $False) {
     Start-Process powershell_ise -Verb runAs
 }
 
-Write-Output Checking ExecutionPolicy.."`n"
+Write-Output "Set Executionpolicy to Bypass" "`n"
 
-Get-ExecutionPolicy
+Write-Output "Checking ExecutionPolicy.." "`n"
+
 
 # Check 
-$ExecutionPolicy = Get-ExecutionPolicy "`n"
+$ExecutionPolicy = Get-ExecutionPolicy
 
-if ($ExecutionPolicy -eq 'Restricted') {
-    Write-Output Setting ExecutionPolicy to Bypass.."`n"
-        Set-ExecutionPolicy Bypass
-    } 
-elseif ($ExecutionPolicy -eq 'AllSigned') {
+if ($ExecutionPolicy -eq 'AllSigned') {
         Write-Output Setting ExecutionPolicy to Bypass.."`n"
         Set-ExecutionPolicy Bypass
     } 
@@ -69,9 +66,6 @@ function Green {
     process { Write-Host $_ -ForegroundColor Green }
 }
 
-function Red {
-    process { Write-Host $_ -ForegroundColor Red }
-}
 
 #Install choco ved hjelp av powershell:
 
