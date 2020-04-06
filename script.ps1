@@ -48,13 +48,13 @@ Get-ExecutionPolicy
 # Check 
 $ExecutionPolicy = Get-ExecutionPolicy "`n"
 
-if ($ExecutionPolicy -like 'Restricted') {
+if ($ExecutionPolicy -eq 'Restricted') {
     Write-Output Setting ExecutionPolicy to Bypass.."`n"
-        Set-ExecutionPolicy Bypass -Scope
+        Set-ExecutionPolicy Bypass
     } 
-elseif ($ExecutionPolicy -like 'AllSigned') {
+elseif ($ExecutionPolicy -eq 'AllSigned') {
         Write-Output Setting ExecutionPolicy to Bypass.."`n"
-        Set-ExecutionPolicy Bypass -Scope
+        Set-ExecutionPolicy Bypass
     } 
 else {
         Write-Output "All good, moving on.." "`n"
@@ -91,7 +91,7 @@ Write-Output Installing apps "`n"
 
         else {
             Write-Output "$(Get-TimeStamp)"
-            exit;
+            
         }
 
     ## Firefox
@@ -103,7 +103,7 @@ Write-Output Installing apps "`n"
         }
         else {
             Write-Output "$(Get-TimeStamp)"
-            exit;
+            
         }
 
     ## 7-Zip
@@ -117,7 +117,7 @@ Write-Output Installing apps "`n"
 
         else {
             Write-Output "$(Get-TimeStamp)"
-            exit;
+            
         }
 
     ## VLC
@@ -130,7 +130,7 @@ Write-Output Installing apps "`n"
 
         else {
             Write-Output "$(Get-TimeStamp)"
-            exit;
+            
         }
 
     ## Discord
@@ -143,7 +143,7 @@ Write-Output Installing apps "`n"
 
         else {
             Write-Output "$(Get-TimeStamp)"
-            exit;
+            
         }
 
     ## ShareX
@@ -156,7 +156,7 @@ Write-Output Installing apps "`n"
 
         else {
             Write-Output "$(Get-TimeStamp)"
-            exit;
+            
         }
 
     ## Teamviewer
@@ -168,7 +168,7 @@ Write-Output Installing apps "`n"
         }
         else {
             Write-Output "$(Get-TimeStamp)"
-            exit;
+            
         }
 
     ## Spotify
@@ -180,7 +180,7 @@ Write-Output Installing apps "`n"
         }
         else {
             Write-Output "$(Get-TimeStamp)"
-            exit;
+            
         }
 
     ## Classic Shell
@@ -192,7 +192,7 @@ Write-Output Installing apps "`n"
         }
         else {
             Write-Output "$(Get-TimeStamp)"
-            exit;
+            
         }
 
     ## Sumatra PDF
@@ -204,7 +204,7 @@ Write-Output Installing apps "`n"
         }
         else {
             Write-Output "$(Get-TimeStamp)"
-            exit;
+            
         }
 
     ## Bitwarden
@@ -217,7 +217,7 @@ Write-Output Installing apps "`n"
         }
         else {
             Write-Output "$(Get-TimeStamp)"
-            exit;
+            
         }
 ## Development
     # Git
@@ -227,7 +227,6 @@ Write-Output Installing apps "`n"
         if ((Test-Path $GitPath) -eq $True) {
             Write-Output "Git CMD successfully installed! Continuing installation.." "`n" | Green
         }
-
         else {
             Write-Output "$(Get-TimeStamp)"
         }
@@ -241,19 +240,17 @@ Write-Output Installing apps "`n"
         if ((Test-Path $VsCodePath) -eq $True) {
             Write-Output "Visual Studio Code successfully installed! Continuing installation.." "`n" | Green
         }
-
         else {
             Write-Output "$(Get-TimeStamp)"
         }
 
    # Sublime Text
         Write-Verbose -Message "Installing Sublime Text" -Verbose     
-        choco install sublimetext2 -y --verbose -log-file=C:\logs\chocolatey\sublimelog.log
+        choco install sublimetext3 -y --verbose -log-file=C:\logs\chocolatey\sublimelog.log
 
         if ((Test-Path $SublimePath) -eq $True) {
-            Write-Output "Sublime Text successfully installed! Continuing installation.." "`n" | Green
+            Write-Output "Sublime Text 3 successfully installed! Continuing installation.." "`n" | Green
         }
-
         else {
             Write-Output "$(Get-TimeStamp)"
         }
@@ -264,7 +261,6 @@ Write-Output Installing apps "`n"
         if ((Test-Path $NotepadPath) -eq $True) {
             Write-Output "Notepad++ successfully installed! Continuing installation.." "`n" | Green
         }
-
         else {
             Write-Output "$(Get-TimeStamp)"
         }
@@ -276,7 +272,6 @@ Write-Output Installing apps "`n"
         if ((Test-Path $MobaXtermPath) -eq $True) {
             Write-Output "MobaXterm successfully installed! Continuing installation.." "`n" | Green
         }
-
         else {
             Write-Output "$(Get-TimeStamp)"
         }
@@ -288,7 +283,6 @@ Write-Output Installing apps "`n"
         if ((Test-Path $PuttyPath) -eq $True) {
             Write-Output "PUTTY successfully installed! Continuing installation.." "`n" | Green
         }
-
         else {
             Write-Output "$(Get-TimeStamp)"
         }
@@ -299,7 +293,6 @@ Write-Output Installing apps "`n"
         if ((Test-Path $OpenSSHPath) -eq $True) {
             Write-Output "OpenSSH successfully installed! Continuing installation.." "`n" | Green
         }
-
         else {
             Write-Output "$(Get-TimeStamp)"
         }
@@ -311,7 +304,6 @@ Write-Output Installing apps "`n"
         if ((Test-Path $Python3Path) -eq $True) {
             Write-Output "Python3 successfully installed! Continuing installation.." "`n" | Green
         }
-
         else {
             Write-Output "$(Get-TimeStamp)"
         }
@@ -321,7 +313,6 @@ Write-Output Installing apps "`n"
         if ((Test-Path $JavaPath) -eq $True) {
             Write-Output "Java successfully installed! Continuing installation.." "`n" | Green
         }
-
         else {
             Write-Output "$(Get-TimeStamp)"
         }
@@ -331,7 +322,6 @@ Write-Output Installing apps "`n"
         if ((Test-Path $Php7Path) -eq $True) {
             Write-Output "PHP successfully installed! Continuing installation.." "`n" | Green
         }
-
         else {
             Write-Output "$(Get-TimeStamp)"
         }
@@ -341,7 +331,6 @@ Write-Output Installing apps "`n"
         if ((Test-Path $DockerPath) -eq $True) {
             Write-Output "Docker successfully installed! Continuing installation.." "`n" | Green
         }
-
         else {
             Write-Output "$(Get-TimeStamp)"
         }
@@ -351,15 +340,17 @@ Write-Output Installing apps "`n"
         if ((Test-Path $OpenVPNPath) -eq $True) {
             Write-Output "OpenVPN successfully installed! Continuing installation.." "`n" | Green
         }
-
         else {
             Write-Output "$(Get-TimeStamp)"
         }
 
+        choco install authy-desktop
+
+        
 ## Update
 
     Write-Output "Checking update" | Green
     choco update all -y
 
 
-Write-Host
+Write-Host "All software installed!"
