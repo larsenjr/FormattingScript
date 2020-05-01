@@ -61,24 +61,21 @@ $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).gr
         process { Write-Host $_ -ForegroundColor Green }
     }
 
-
     # Function to hold Window to the you press a key. 
-    Function PressKey
-    {
-    Write-Host -NoNewline -Object 'Press any key to continue...' -ForegroundColor Yellow
-    $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
-    Menu
+    Function PressKey {
+        Write-Host -NoNewline -Object 'Press any key to continue...' -ForegroundColor Yellow
+        $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
     }
-
 
 #Install choco ved hjelp av powershell:
 
-    Write-Output Configuring chocolatey.. "`n"
+    Write-Output "Configuring chocolatey.." | Green
+
     Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
 
-    PressKey
-    Write-Output Installing apps "`n"
+    # PressKey
+    Write-Output "Installing apps.." | Green
 
 ## Essentials
     ## Google Chrome
@@ -440,10 +437,8 @@ Write-Host "Removing Windows Bloatware." -ForegroundColor Yellow
 # Specify what program to run and with its parameters
     $Action= New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Path
 # Specify the name of the task
-    Register-ScheduledTask -TaskName "Continiued Powershell Formatting Script" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest –Force 
+    Register-ScheduledTask -TaskName "Continiued Powershell Formatting Script" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest -Force 
 
 Write-host "The script has installed programs successfully"
 
-Read-Host "Press any key to continue . . ." | Out-Null
-
-
+Read-Host "Press any key to continue" | Out-Null
