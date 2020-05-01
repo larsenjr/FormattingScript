@@ -1,12 +1,9 @@
-
 #Requires -RunAsAdministrator
 # Install script for choco etter formatting
-# 04.04.2020
+# 2020
 # Stian Larsen
 # 
 # Need internet to work
-# KEK
-
 
 ## Vars / Paths
 $GooglePath = "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
@@ -35,31 +32,43 @@ $DockerPath = "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 $OpenVPNPath ="C:\Program Files\OpenVPN\bin\openvpn-gui.exe"
 
 
-# Check that Powershell is opened in privileged mode
+# Check that Powershell is opened in elevated mode
 
 $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match "S-1-5-32-544")
 
-if ($isAdmin -eq $False) {
-    Write-Host "You need to start this script as admin!" "`n"
-    Start-Sleep -Seconds 2
-    Start-Process powershell_ise -Verb runAs
-}
+    if ($isAdmin -eq $False) {
+        Write-Host "You need to start this script as admin!" "`n"
+        Start-Sleep -Seconds 2
+        Start-Process powershell_ise -Verb runAs
+    }
 ## .bat
-if ($isAdmin -eq $True) {
-    $RunBat = .\executionPolicy.bat 
-    Start-Process "cmd.exe" /c $RunBat
-    Write-Output "Setting ExecutionPolicy to Bypass"
-}
+    if ($isAdmin -eq $True) {
+        $RunBat = .\executionPolicy.bat 
+        Start-Process "cmd.exe" /c $RunBat
+        Write-Output "Setting ExecutionPolicy to Bypass"
+    }
+
+## Functions
+
+    # Get the timestamp. Used to track error-messages
+    function Get-TimeStamp {
+        return "[{0:MM/dd/yy} {0:HH:mm:ss}]" -f (Get-Date)
+    }
 
 
-function Get-TimeStamp {
-    return "[{0:MM/dd/yy} {0:HH:mm:ss}]" -f (Get-Date)
-}
+    # Function for green writing
+    function Green {
+        process { Write-Host $_ -ForegroundColor Green }
+    }
 
-function Green {
-    process { Write-Host $_ -ForegroundColor Green }
-}
 
+    # Function to hold Window to the you press a key. 
+    Function PressKey
+    {
+    Write-Host -NoNewline -Object 'Press any key to continue...' -ForegroundColor Yellow
+    $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown')
+    Menu
+    }
 
 
 #Install choco ved hjelp av powershell:
@@ -67,12 +76,14 @@ function Green {
     Write-Output Configuring chocolatey.. "`n"
     Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
-Write-Output Installing apps "`n"
+
+    PressKey
+    Write-Output Installing apps "`n"
 
 ## Essentials
     ## Google Chrome
         Write-Verbose -Message "Installing Google Chrome" -Verbose
-        choco install googlechrome -y --verbose --log-file=C:\logs\chocolatey\googleChromelog.log
+            choco install googlechrome -y --verbose --log-file=C:\logs\chocolatey\googleChromelog.log
 
         if ((Test-Path $GooglePath) -eq $True) {
             Write-Output "Google Chrome successfully installed! Continuing installation.." "`n" | Green
@@ -85,7 +96,7 @@ Write-Output Installing apps "`n"
 
     ## Firefox
         Write-Output "Installing Firefox.." "`n"
-        choco install firefox -y --verbose -log-file=C:\logs\chocolatey\Firefoxlog.log
+            choco install firefox -y --verbose -log-file=C:\logs\chocolatey\Firefoxlog.log
 
         if ((Test-Path $FirefoxPath) -eq $True) {
             Write-Output "Firefox successfully installed! Continuing installation.." "`n" | Green
@@ -98,7 +109,7 @@ Write-Output Installing apps "`n"
     ## 7-Zip
 
         Write-Verbose -Message "Installing 7zip" -Verbose
-        choco install 7zip.install -y --verbose -log-file=C:\logs\chocolatey\7ziplog.log
+            choco install 7zip.install -y --verbose -log-file=C:\logs\chocolatey\7ziplog.log
 
         if ((Test-Path $7ZipPath) -eq $True) {
             Write-Output "7-Zip successfully installed! Continuing installation.." "`n" | Green
@@ -111,7 +122,7 @@ Write-Output Installing apps "`n"
 
     ## VLC
         Write-Verbose -Message "Installing VLC" -Verbose
-        choco install vlc -y --verbose -log-file=C:\logs\chocolatey\vlclog.log
+            choco install vlc -y --verbose -log-file=C:\logs\chocolatey\vlclog.log
 
         if((Test-Path $VlcPath) -eq $True) {
             Write-Output "VLC successfully installed! Continuing installation.." "`n" | Green
@@ -124,7 +135,7 @@ Write-Output Installing apps "`n"
 
     ## Discord
         Write-Verbose -Message "Installing Discord" -Verbose
-        choco install discord.install -y --verbose -log-file=C:\logs\chocolatey\discordlog.log
+            choco install discord.install -y --verbose -log-file=C:\logs\chocolatey\discordlog.log
 
         if ((Test-Path $DiscordPath) -eq $True) {
             Write-Output "Discord successfully installed! Continuing installation.." "`n" | Green
@@ -137,7 +148,7 @@ Write-Output Installing apps "`n"
 
     ## ShareX
         Write-Verbose -Message "Installing ShareX" -Verbose
-        choco install sharex -y --verbose -log-file=C:\logs\chocolatey\sharexlog.log
+            choco install sharex -y --verbose -log-file=C:\logs\chocolatey\sharexlog.log
 
         if((Test-Path $ShareXPath) -eq $True) {
             Write-Output "ShareX successfully installed! Continuing installation.." "`n" | Green
@@ -150,11 +161,12 @@ Write-Output Installing apps "`n"
 
     ## Teamviewer
         Write-Verbose -Message "Installing TeamViewer" -Verbose
-        choco install teamviewer -y --verbose -log-file=C:\logs\chocolatey\teamviewerlog.log
+            choco install teamviewer -y --verbose -log-file=C:\logs\chocolatey\teamviewerlog.log
 
         if ((Test-Path $TeamViewerPath) -eq $True) {
             Write-Output "Teamviewer successfully installed! Continuing installation.." "`n" | Green
         }
+
         else {
             Write-Output "$(Get-TimeStamp)"
             
@@ -162,11 +174,12 @@ Write-Output Installing apps "`n"
 
     ## Spotify
         Write-Verbose -Message"Installing Spotify" -Verbose
-        choco install spotify -y --verbose -log-file=C:\logs\chocolatey\spotifylog.log
+            choco install spotify -y --verbose -log-file=C:\logs\chocolatey\spotifylog.log
 
         if ((Test-Path $SpotifyPath) -eq $True) {
             Write-Output "Spotify successfully installed! Continuing installation.." "`n" | Green
         }
+
         else {
             Write-Output "$(Get-TimeStamp)"
             
@@ -174,11 +187,12 @@ Write-Output Installing apps "`n"
 
     ## Classic Shell
         Write-Verbose -Message "Installing Classic Shell" -Verbose
-        choco install classic-shell -y --verbose -log-file=C:\logs\chocolatey\classicshellog.log
+            choco install classic-shell -y --verbose -log-file=C:\logs\chocolatey\classicshellog.log
 
         if ((Test-Path $ClassicShellPath) -eq $True) {
             Write-Output "Classic Shell successfully installed! Continuing installation.." "`n" | Green
         }
+
         else {
             Write-Output "$(Get-TimeStamp)"
             
@@ -186,11 +200,12 @@ Write-Output Installing apps "`n"
 
     ## Sumatra PDF
         Write-Verbose -Message "Installing SumatraPDF" -Verbose
-        choco install sumatrapdf.install -y --verbose -log-file=C:\logs\chocolatey\sumatralog.log
+            choco install sumatrapdf.install -y --verbose -log-file=C:\logs\chocolatey\sumatralog.log
 
         if ((Test-Path $SumatraPath) -eq $True) {
             Write-Output "Sumatra PDF successfully installed! Continuing installation.." "`n" | Green
         }
+
         else {
             Write-Output "$(Get-TimeStamp)"
             
@@ -199,57 +214,62 @@ Write-Output Installing apps "`n"
     ## Bitwarden
 
         Write-Verbose -Message "Installing Bitwarden" -Verbose
-        choco install bitwarden -y --verbose -log-file=C:\logs\chocolatey\bitwardenlog.log
+            choco install bitwarden -y --verbose -log-file=C:\logs\chocolatey\bitwardenlog.log
 
         if ((Test-Path $BitwardenPath) -eq $True) {
             Write-Output "Bitwarden Desktop successfully installed! Continuing installation.." "`n" | Green
         }
+
         else {
             Write-Output "$(Get-TimeStamp)"
             
         }
-## Development
+# Development
     # Git
         Write-Verbose -Message "Installing Git" -Verbose
-        choco install git.install -y --verbose -log-file=C:\logs\chocolatey\gitlog.log
+            choco install git.install -y --verbose -log-file=C:\logs\chocolatey\gitlog.log
 
         if ((Test-Path $GitPath) -eq $True) {
             Write-Output "Git CMD successfully installed! Continuing installation.." "`n" | Green
         }
+
         else {
             Write-Output "$(Get-TimeStamp)"
         }
 
     # VSCode
-
         Write-Verbose -Message "Installing Visual Studio Code" -Verbose
-
-        choco install vscode.install -y --verbose -log-file=C:\logs\chocolatey\vscodelog.log
+            choco install vscode.install -y --verbose -log-file=C:\logs\chocolatey\vscodelog.log
 
         if ((Test-Path $VsCodePath) -eq $True) {
             Write-Output "Visual Studio Code successfully installed! Continuing installation.." "`n" | Green
         }
+
         else {
             Write-Output "$(Get-TimeStamp)"
         }
 
-   # Sublime Text
+   # Sublime Text 3
         Write-Verbose -Message "Installing Sublime Text" -Verbose     
-        choco install sublimetext3 -y --verbose -log-file=C:\logs\chocolatey\sublimelog.log
+            choco install sublimetext3 -y --verbose -log-file=C:\logs\chocolatey\sublimelog.log
 
         if ((Test-Path $SublimePath) -eq $True) {
             Write-Output "Sublime Text 3 successfully installed! Continuing installation.." "`n" | Green
         }
+
         else {
             Write-Output "$(Get-TimeStamp)"
         }
 
-    # Notepad ++ 7.8.5
+    # Notepad++ 7.8.5
+
         Write-Verbose -Message "Installing Notepad++ Version 7.8.5" -Verbose
-        choco install notepadplusplus.install -y --verbose -log-file=C:\logs\chocolatey\notepadlog.log
+            choco install notepadplusplus.install -y --verbose -log-file=C:\logs\chocolatey\notepadlog.log
+
         if ((Test-Path $NotepadPath) -eq $True) {
             Write-Output "Notepad++ successfully installed! Continuing installation.." "`n" | Green
         }
+
         else {
             Write-Output "$(Get-TimeStamp)"
         }
@@ -257,31 +277,36 @@ Write-Output Installing apps "`n"
     # MobaXterm
 
         Write-Verbose -Message "Installing MobaXterm" -Verbose
-        choco install mobaxterm --verbose -log-file=C:\logs\chocolatey\mobaxtermlog.log
+            choco install mobaxterm -y --verbose -log-file=C:\logs\chocolatey\mobaxtermlog.log
+
         if ((Test-Path $MobaXtermPath) -eq $True) {
             Write-Output "MobaXterm successfully installed! Continuing installation.." "`n" | Green
         }
+
         else {
             Write-Output "$(Get-TimeStamp)"
         }
 
     # Putty
         Write-Verbose -Message "Installing PUTTY" -Verbose
-        choco install putty -y --verbose -log-file=C:\logs\chocolatey\puttylog.log
+            choco install putty -y --verbose -log-file=C:\logs\chocolatey\puttylog.log
 
         if ((Test-Path $PuttyPath) -eq $True) {
             Write-Output "PUTTY successfully installed! Continuing installation.." "`n" | Green
         }
+
         else {
             Write-Output "$(Get-TimeStamp)"
         }
 
     # OpenSSH
         Write-Verbose -Message "Installing OpenSSH" -Verbose
-        choco install openssh -y --verbose -log-file=C:\logs\chocolatey\opensshlog.log
+            choco install openssh -y --verbose -log-file=C:\logs\chocolatey\opensshlog.log
+
         if ((Test-Path $OpenSSHPath) -eq $True) {
             Write-Output "OpenSSH successfully installed! Continuing installation.." "`n" | Green
         }
+
         else {
             Write-Output "$(Get-TimeStamp)"
         }
@@ -289,61 +314,74 @@ Write-Output Installing apps "`n"
 # Languages
     # Python3
         Write-Verbose -Message "Installing Python3" -Verbose
-        choco install python3 -y --verbose -log-file=C:\logs\chocolatey\python3log.log
+            choco install python3 -y --verbose -log-file=C:\logs\chocolatey\python3log.log
+
         if ((Test-Path $Python3Path) -eq $True) {
             Write-Output "Python3 successfully installed! Continuing installation.." "`n" | Green
         }
+
         else {
             Write-Output "$(Get-TimeStamp)"
         }
+
     # Java
         Write-Verbose -Message "Installing Java" -Verbose
-        choco install javaruntime -y --verbose -log-file=C:\logs\chocolatey\javalog.log
+            choco install javaruntime -y --verbose -log-file=C:\logs\chocolatey\javalog.log
+        
         if ((Test-Path $JavaPath) -eq $True) {
             Write-Output "Java successfully installed! Continuing installation.." "`n" | Green
         }
+
         else {
             Write-Output "$(Get-TimeStamp)"
         }
+
     # PHP7
         Write-Verbose -Message "Installing PHP7" -Verbose
-        choco install php -y --verbose -log-file=C:\logs\chocolatey\php7log.log
+            choco install php -y --verbose -log-file=C:\logs\chocolatey\php7log.log
+
         if ((Test-Path $Php7Path) -eq $True) {
             Write-Output "PHP successfully installed! Continuing installation.." "`n" | Green
         }
+
         else {
             Write-Output "$(Get-TimeStamp)"
         }
+
     # Docker
         Write-Verbose -Message "Installing Docker" -Verbose
-        choco install php -y --verbose -log-file=C:\logs\chocolatey\dockerlog.log
+            choco install php -y --verbose -log-file=C:\logs\chocolatey\dockerlog.log
+
         if ((Test-Path $DockerPath) -eq $True) {
             Write-Output "Docker successfully installed! Continuing installation.." "`n" | Green
         }
+
         else {
             Write-Output "$(Get-TimeStamp)"
         }
+
     #OpenVPN
         Write-Verbose -Message "Installing OpenVPN" -Verbose
-        choco install php -y --verbose -log-file=C:\logs\chocolatey\dockerlog.log
+            choco install php -y --verbose -log-file=C:\logs\chocolatey\dockerlog.log
+
         if ((Test-Path $OpenVPNPath) -eq $True) {
             Write-Output "OpenVPN successfully installed! Continuing installation.." "`n" | Green
         }
+
         else {
             Write-Output "$(Get-TimeStamp)"
         }
 
-        
 ## Update
 
     Write-Output "Checking updates" | Green
-    choco update all -A
+        choco update all -A
 
     Write-Host "All software installed!"
 
 # Removes Windows default programs
 
-Write-Host "Removing Windows Bloatware."
+Write-Host "Removing Windows Bloatware." -ForegroundColor Yellow
 
 "Get-AppxPackage *3DBuilder* | Remove-AppxPackage"
 "Get-AppxPackage *Getstarted* | Remove-AppxPackage"
@@ -382,13 +420,30 @@ Write-Host "Removing Windows Bloatware."
     $Confirmation = Read-host " ( y / n ) "
 
     switch ($Confirmation) {
-            y {Write-Host "Your computer will be restarted in 5 seconds"; Start-Sleep -Seconds 5; Restart-Computer}
+            y {Write-Host "Your computer will be restarted in 5 seconds"; Start-Sleep -Seconds 5; Restart-Computer;}
             n {Write-Host "You have to manually restart $env:COMPUTERNAME by yourself for the changes to take effect"}
         }
 
     if($Confirmation -eq 'yes') {
         Start-Sleep -Seconds 5; Restart-Computer
     }
+
     else {
         Break;
     }
+
+# Specify the trigger settings
+    $Trigger= New-ScheduledTaskTrigger -AtStartup
+# Specify the account to run the script
+    $User= "NT AUTHORITY\SYSTEM"
+    $Path = Get-Location
+# Specify what program to run and with its parameters
+    $Action= New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Path
+# Specify the name of the task
+    Register-ScheduledTask -TaskName "Continiued Powershell Formatting Script" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest –Force 
+
+Write-host "The script has installed programs successfully"
+
+Read-Host "Press any key to continue . . ." | Out-Null
+
+

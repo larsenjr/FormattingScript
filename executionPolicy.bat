@@ -1,4 +1,5 @@
 @echo off
 
-PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& {Start-Process PowerShell -ArgumentList 'NoProfile -ExecutionPolicy RemoteSigned -Force' -File ""D:\Projects\Formattingscript\script.ps1""' -Verb RunAs}"
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& {Start-Process PowerShell -ArgumentList 'Set-ExecutionPolicy RemoteSigned -Force' -Verb RunAs}"
 
+exit
