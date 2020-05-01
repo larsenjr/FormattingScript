@@ -7,6 +7,7 @@
 # Need internet to work
 # KEK
 
+
 ## Vars / Paths
 $GooglePath = "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
 $FirefoxPath = "C:\Program Files\Mozilla Firefox\firefox.exe"
@@ -33,6 +34,12 @@ $Php7Path = "C:\Tools\php74\php.exe"
 $DockerPath = "C:\Program Files\Docker\Docker\Docker Desktop.exe"
 $OpenVPNPath ="C:\Program Files\OpenVPN\bin\openvpn-gui.exe"
 
+
+# Prompt for new ComputerName
+$NewComputerName = Read-Host -Prompt "Enter New Computer name: "
+
+# Check that Powershell is opened in privileged mode
+
 $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match "S-1-5-32-544")
 
 if ($isAdmin -eq $False) {
@@ -40,22 +47,12 @@ if ($isAdmin -eq $False) {
     Start-Sleep -Seconds 2
     Start-Process powershell_ise -Verb runAs
 }
-
-Write-Output "Set Executionpolicy to Bypass" "`n"
-
-Write-Output "Checking ExecutionPolicy.." "`n"
-
-
-# Check 
-$ExecutionPolicy = Get-ExecutionPolicy
-
-if ($ExecutionPolicy -eq 'AllSigned') {
-        Write-Output Setting ExecutionPolicy to Bypass.."`n"
-        Set-ExecutionPolicy Bypass
-    } 
-else {
-        Write-Output "All good, moving on.." "`n"
-    }
+## .bat
+if ($isAdmin -eq $True) {
+    $RunBat = .\executionPolicy.bat 
+    Start-Process "cmd.exe" /c $RunBat
+    Write-Output "Setting ExecutionPolicy to Bypass"
+}
 
 
 function Get-TimeStamp {
@@ -67,10 +64,11 @@ function Green {
 }
 
 
+
 #Install choco ved hjelp av powershell:
 
     Write-Output Configuring chocolatey.. "`n"
-    Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+    Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
 Write-Output Installing apps "`n"
 
@@ -338,13 +336,61 @@ Write-Output Installing apps "`n"
             Write-Output "$(Get-TimeStamp)"
         }
 
-        choco install authy-desktop
-
         
 ## Update
 
-    Write-Output "Checking update" | Green
-    choco update all -y
+    Write-Output "Checking updates" | Green
+    choco update all -A
+
+    Write-Host "All software installed!"
+
+# Removes Windows default programs
+
+Write-Host "Removing Windows Bloatware."
+
+"Get-AppxPackage *3DBuilder* | Remove-AppxPackage"
+"Get-AppxPackage *Getstarted* | Remove-AppxPackage"
+"Get-AppxPackage *WindowsAlarms* | Remove-AppxPackage"
+"Get-AppxPackage *WindowsCamera* | Remove-AppxPackage"
+"Get-AppxPackage *bing* | Remove-AppxPackage"
+"Get-AppxPackage *MicrosoftOfficeHub* | Remove-AppxPackage"
+"Get-AppxPackage *OneNote* | Remove-AppxPackage"
+"Get-AppxPackage *people* | Remove-AppxPackage"
+"Get-AppxPackage *WindowsPhone* | Remove-AppxPackage"
+"Get-AppxPackage *photos* | Remove-AppxPackage"
+"Get-AppxPackage *SkypeApp* | Remove-AppxPackage"
+"Get-AppxPackage *solit* | Remove-AppxPackage"
+"Get-AppxPackage *WindowsSoundRecorder* | Remove-AppxPackage"
+"Get-AppxPackage *windowscommunicationsapps* | Remove-AppxPackage"
+"Get-AppxPackage *zune* | Remove-AppxPackage"
+"Get-AppxPackage *WindowsCalculator* | Remove-AppxPackage"
+"Get-AppxPackage *WindowsMaps* | Remove-AppxPackage"
+"Get-AppxPackage *Sway* | Remove-AppxPackage"
+"Get-AppxPackage *CommsPhone* | Remove-AppxPackage"
+"Get-AppxPackage *ConnectivityStore* | Remove-AppxPackage"
+"Get-AppxPackage *Microsoft.Messaging* | Remove-AppxPackage"
+"Get-AppxPackage *Facebook* | Remove-AppxPackage"
+"Get-AppxPackage *Twitter* | Remove-AppxPackage"
+"Get-AppxPackage *Drawboard PDF* | Remove-AppxPackage"
 
 
-Write-Host "All software installed!"
+Write-Host "Changing name.." -ForegroundColor Yellow
+
+Rename-Computer -NewName $NewComputerName
+Add-Computer -WorkgroupName WORKGROUP
+
+Write-host "$env:COMPUTERNAME needs to be restarted. Do you want to do it now?" -ForegroundColor Yellow
+
+$Confirmation = Read-host " ( y / n ) "
+
+switch ($Confirmation) {
+    y {Write-Host "Your computer will be restarted in 5 seconds"; Start-Sleep -Seconds 5; Restart-Computer}
+    n {Write-Host "You have to manually restart $env:COMPUTERNAME by yourself for the changes to take effect"}
+}
+
+if($Confirmation -eq 'yes') {
+    Start-Sleep -Seconds 5; Restart-Computer
+}
+else {
+    Break;
+}
