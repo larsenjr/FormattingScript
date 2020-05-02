@@ -375,28 +375,46 @@ $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).gr
     Write-Output "Checking updates" | Green
         choco update all -A
 
-    Write-Host "All software installed!"
-
 # Removes Windows default programs
 
-$ImportCSV = Import-Csv -Delimiter "," -Path ".\RemoveAppxPackage.csv"
-
 Write-Host "Removing Windows Bloatware." -ForegroundColor Yellow
-    $AppList =
+    $AppList = 
+            "*3DBuilder*",
+            "*Getstarted*",
+            "*WindowsAlarms*",
+            "*WindowsCamera*",
+            "*bing*",
+            "*MicrosoftOfficeHub*",
+            "*OneNote*",
+            "*people*",
+            "*WindowsPhone*",
+            "*photos*",
+            "*SkypeApp*",
+            "*solit*",
+            "*WindowsSoundRecorder*",
+            "*windowscommunicationsapps*",
+            "*zune*",
+            "*WindowsMaps*",
+            "*Sway*",
+            "*CommsPhone*",
+            "*ConnectivityStore*",
+            "*Microsoft.Messaging*",
+            "*Facebook*",
+            "*Twitter*",
+            "*Drawboard PDF*"
 
-    ForEach ($App in $ImportCSV) {
+    ForEach ($App in $AppList) {
         $AppPackageFullName = (Get-AppxPackage $App).PackageFullName
 
         if ($AppPackageFullName) {
             Write-Host "Removing Package: $App"
             Remove-AppxPackage -package $PackageFullName
         }
+        else {
+            Write-host "Unable to find package: $App"
+        }
     }
     
-    else {
-        Write-host "Unable to find package: $App"
-    }
-
 # Prompt for new ComputerName
     $NewComputerName = Read-Host -Prompt "Enter New Computer name: "
     Write-Host "Changing name.." -ForegroundColor Yellow
@@ -428,8 +446,6 @@ Write-Host "Removing Windows Bloatware." -ForegroundColor Yellow
             Out-Null;
         }
 
-
-        
 # Specify the trigger settings
     $Trigger= New-JobTrigger -AtStartup -RandomDelay 00:00:15
 # Specify the account to run the script
@@ -448,6 +464,6 @@ Write-Host "Removing Windows Bloatware." -ForegroundColor Yellow
         Add-Computer -DomainName $WriteDomain
     }
 
-Write-host "The script has installed programs successfully!" 
+Write-host "The script has installed all programs successfully!" 
 
 Read-Host "Press any key to continue" | Out-Null

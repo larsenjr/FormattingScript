@@ -1,22 +1,23 @@
-"            ""*3DBuilder*"", "
-"            ""*Getstarted*"", "
-"            ""*WindowsAlarms*"", "
-"            ""*WindowsCamera*"","
-"            ""*bing*"","
-"            ""*MicrosoftOfficeHub*"", "
-"            ""*OneNote*"", "
-"            ""*people*"", "
-"            ""*WindowsPhone*"", "
-"            ""*photos*"", "
-"            ""*SkypeApp*"", "
-"            ""*solit*"","
-"            ""*WindowsSoundRecorder*"", "
-"            ""*windowscommunicationsapps*"", "
-"            ""*zune*"", "
-"            ""*WindowsMaps*"","
-"            ""*Sway*"","
-"            ""*CommsPhone*"","
-"            ""*ConnectivityStore*"", "
-"            ""*Microsoft.Messaging* "", "
-"            ""*Facebook*"", ""*Twitter*"", "
-"            ""*Drawboard PDF*"""
+3DBuilder,
+Getstarted, 
+WindowsAlarms, 
+WindowsCamera,
+bing,
+MicrosoftOfficeHub, 
+OneNote, 
+people, 
+WindowsPhone, 
+photos, 
+SkypeApp, 
+solit,
+WindowsSoundRecorder, 
+windowscommunicationsapps, 
+zune, 
+WindowsMaps,
+Sway,
+CommsPhone,
+ConnectivityStore, 
+Microsoft.Messaging, 
+"Facebook"", "
+Twitter, 
+Drawboard PDF
