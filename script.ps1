@@ -379,32 +379,12 @@ $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).gr
 
 # Removes Windows default programs
 
+$ImportCSV = Import-Csv -Delimiter "," -Path ".\RemoveAppxPackage.csv"
+
 Write-Host "Removing Windows Bloatware." -ForegroundColor Yellow
     $AppList =
-            "*3DBuilder*", 
-            "*Getstarted*", 
-            "*WindowsAlarms*", 
-            "*WindowsCamera*",
-            "*bing*",
-            "*MicrosoftOfficeHub*", 
-            "*OneNote*", 
-            "*people*", 
-            "*WindowsPhone*", 
-            "*photos*", 
-            "*SkypeApp*", 
-            "*solit*",
-            "*WindowsSoundRecorder*", 
-            "*windowscommunicationsapps*", 
-            "*zune*", 
-            "*WindowsMaps*",
-            "*Sway*",
-            "*CommsPhone*",
-            "*ConnectivityStore*", 
-            "*Microsoft.Messaging* ", 
-            "*Facebook*", "*Twitter*", 
-            "*Drawboard PDF*"
 
-    ForEach ($App in $AppList) {
+    ForEach ($App in $ImportCSV) {
         $AppPackageFullName = (Get-AppxPackage $App).PackageFullName
 
         if ($AppPackageFullName) {
@@ -424,31 +404,34 @@ Write-Host "Removing Windows Bloatware." -ForegroundColor Yellow
     Rename-Computer -NewName $NewComputerName
 
 # Adding computer to Workgroup
-$AlreadyWorkGroup = 'WORKGROUP'
-    if ($AlreadyWorkGroup -eq $True) {
-        Continue;
-    }
+    $AlreadyWorkGroup = 'WORKGROUP'
+        if ($AlreadyWorkGroup -eq $True) {
+            Continue;
+        }
+
     Add-Computer -WorkgroupName WORKGROUP
 
     Write-host "$env:COMPUTERNAME needs to be restarted. Do you want to do it now?" -ForegroundColor Yellow
 
     $Confirmation = Read-host " ( y / n ) "
 
-    switch ($Confirmation) {
-            y {Write-Host "Your computer will be restarted in 5 seconds" -ForegroundColor Green; Start-Sleep -Seconds 5; Restart-Computer;}
-            n {Write-Host "You have to manually restart $env:COMPUTERNAME by yourself for the changes to take effect" -ForegroundColor Red;}
+        switch ($Confirmation) {
+                y {Write-Host "Your computer will be restarted in 5 seconds" -ForegroundColor Green; Start-Sleep -Seconds 5; Restart-Computer;}
+                n {Write-Host "You have to manually restart $env:COMPUTERNAME by yourself for the changes to take effect" -ForegroundColor Red;}
+            }
+
+        if($Confirmation -eq 'yes') {
+            Start-Sleep -Seconds 5; Restart-Computer
         }
 
-    if($Confirmation -eq 'yes') {
-        Start-Sleep -Seconds 5; Restart-Computer
-    }
+        else {
+            Out-Null;
+        }
 
-    else {
-        Break;
-    }
 
+        
 # Specify the trigger settings
-    $Trigger= New-ScheduledTaskTrigger -AtStartup
+    $Trigger= New-JobTrigger -AtStartup -RandomDelay 00:00:15
 # Specify the account to run the script
     $User= "NT AUTHORITY\SYSTEM"
     $Path = Get-Location
@@ -458,13 +441,13 @@ $AlreadyWorkGroup = 'WORKGROUP'
     Register-ScheduledTask -TaskName "Continiued Powershell Formatting Script" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest -Force 
 
 # Domain Join
-$IfShouldJoinDomain = Read-Host -Prompt "Should the computer join a domain? "
+    $IfShouldJoinDomain = Read-Host -Prompt "Should the computer join a domain? "
 
-if ($IfShouldJoinDomain -eq 'y') {
-    $WriteDomain = Read-Host -Prompt "Specify your domain name"
-    Add-Computer -DomainName $WriteDomain
-}
+    if ($IfShouldJoinDomain -eq 'y') {
+        $WriteDomain = Read-Host -Prompt "Specify your domain name"
+        Add-Computer -DomainName $WriteDomain
+    }
 
-Write-host "The script has installed programs successfully"
+Write-host "The script has installed programs successfully!" 
 
 Read-Host "Press any key to continue" | Out-Null
