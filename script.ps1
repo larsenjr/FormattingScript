@@ -421,11 +421,7 @@ Write-Host "Removing Windows Bloatware." -ForegroundColor Yellow
 
     Rename-Computer -NewName $NewComputerName
 
-# Adding computer to Workgroup
-    $AlreadyWorkGroup = 'WORKGROUP'
-        if ($AlreadyWorkGroup -eq $True) {
-            Continue;
-        }
+
 
     Add-Computer -WorkgroupName WORKGROUP
 
@@ -446,6 +442,27 @@ Write-Host "Removing Windows Bloatware." -ForegroundColor Yellow
             Out-Null;
         }
 
+# Domain Join
+    $IfShouldJoinDomain = Read-Host -Prompt "Should the computer join a domain? "
+    # Adding machine to Domain
+        if ($IfShouldJoinDomain -eq 'y') {
+            $WriteDomain = Read-Host -Prompt "Specify your domain name"
+            Add-Computer -DomainName $WriteDomain
+        }
+
+    # Adding computer to Workgroup
+        if ($IfShouldJoinDomain -eq 'n') {
+            $NoDomainAssignWorkgroup = 'WORKGROUP'
+                if ($AlreadyWorkGroup -eq $True) {
+                    Out-Null;
+                }
+                if ($NoDomainAssignWorkgroup -eq $False) {
+                    Add-Computer -WorkgroupName "Workgroup" | Start-Sleep -Seconds 5; Restart-Computer;
+                }
+
+        }
+    
+
 # Specify the trigger settings
     $Trigger= New-JobTrigger -AtStartup -RandomDelay 00:00:15
 # Specify the account to run the script
@@ -456,14 +473,9 @@ Write-Host "Removing Windows Bloatware." -ForegroundColor Yellow
 # Specify the name of the task
     Register-ScheduledTask -TaskName "Continiued Powershell Formatting Script" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest -Force 
 
-# Domain Join
-    $IfShouldJoinDomain = Read-Host -Prompt "Should the computer join a domain? "
-
-    if ($IfShouldJoinDomain -eq 'y') {
-        $WriteDomain = Read-Host -Prompt "Specify your domain name"
-        Add-Computer -DomainName $WriteDomain
-    }
-
-Write-host "The script has installed all programs successfully!" 
+Finally {
+    $Time=Get-Date
+    Write-Host "Script have successfully installed all programs at $Time" | Out-File $env:USERPROFILE\logs\FormattingScript.log -Append
+}
 
 Read-Host "Press any key to continue" | Out-Null
