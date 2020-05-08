@@ -56,7 +56,6 @@ $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).gr
         return "[{0:MM/dd/yy} {0:HH:mm:ss}]" -f (Get-Date)
     }
 
-
     # Function for green writing
     function Green {
         process { Write-Host $_ -ForegroundColor Green }
@@ -77,8 +76,11 @@ $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).gr
 
     # PressKey
     Write-Output "Installing apps.." | Green
+    foreach ($Program in $AppPaths) {
 
+    }
 ## Essentials
+
     ## Google Chrome
         Write-Verbose -Message "Installing Google Chrome" -Verbose
             choco install googlechrome -y --verbose --log-file=C:\logs\chocolatey\googleChromelog.log
@@ -416,66 +418,60 @@ Write-Host "Removing Windows Bloatware." -ForegroundColor Yellow
     }
     
 # Prompt for new ComputerName
-    $NewComputerName = Read-Host -Prompt "Enter New Computer name: "
-    Write-Host "Changing name.." -ForegroundColor Yellow
+$NewComputerName = Read-Host -Prompt "Enter New Computer name: "
+Write-Host "Changing name.." -ForegroundColor Yellow | Rename-Computer -NewName $NewComputerName
 
-    Rename-Computer -NewName $NewComputerName
+Write-host "$env:COMPUTERNAME needs to be restarted. Do you want to do it now?" -ForegroundColor Yellow
+
+$Path = Get-Location
+$Action= New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "$env:USERPROFILE\script.ps1"
+$TaskTrigger = New-ScheduledTaskTrigger -AtLogon -RunOnce
+$TaskUser = New-ScheduledTaskPrincipal "$env:USERPROFILE"
+$TaskSettingSet = New-ScheduledTaskSettingsSet
+$NewTask = New-ScheduledTask -Action $Action -Principal $TaskUser -Trigger $TaskTrigger -Settings $TaskSettingSet
+
+$Confirmation = Read-host " ( y / n ) "
 
 
-
-    Add-Computer -WorkgroupName WORKGROUP
-
-    Write-host "$env:COMPUTERNAME needs to be restarted. Do you want to do it now?" -ForegroundColor Yellow
-
-    $Confirmation = Read-host " ( y / n ) "
-
-        switch ($Confirmation) {
-                y {Write-Host "Your computer will be restarted in 5 seconds" -ForegroundColor Green; Start-Sleep -Seconds 5; Restart-Computer;}
-                n {Write-Host "You have to manually restart $env:COMPUTERNAME by yourself for the changes to take effect" -ForegroundColor Red;}
-            }
-
-        if($Confirmation -eq 'yes') {
-            Start-Sleep -Seconds 5; Restart-Computer
+    switch ($Confirmation) {
+            y {Write-Host "Your computer will be restarted in 5 seconds" -ForegroundColor Green; Register-ScheduledTask Script.ps1 -InputObject $NewTask;Start-Sleep 5; Restart-Computer}
+            n {Write-Host "You have to manually restart $env:COMPUTERNAME by yourself for the changes to take effect" -ForegroundColor Red; Exit;}
+            
         }
 
-        else {
-            Out-Null;
-        }
+    if($Confirmation -eq 'yes') {
+        Start-Sleep -Seconds 5; Restart-Computer
+    }
+
+    else {
+        Out-Null;
+    }
+
 
 # Domain Join
-    $IfShouldJoinDomain = Read-Host -Prompt "Should the computer join a domain? "
-    # Adding machine to Domain
-        if ($IfShouldJoinDomain -eq 'y') {
-            $WriteDomain = Read-Host -Prompt "Specify your domain name"
-            Add-Computer -DomainName $WriteDomain
-        }
+$IfShouldJoinDomain = Read-Host -Prompt "Should the computer join a domain? "
+# Adding machine to Domain
+    if ($IfShouldJoinDomain -eq 'y') {
+        $WriteDomain = Read-Host -Prompt "Specify your domain name"
+        Add-Computer -DomainName $WriteDomain
+    }
 
-    # Adding computer to Workgroup
-        if ($IfShouldJoinDomain -eq 'n') {
-            $NoDomainAssignWorkgroup = 'WORKGROUP'
-                if ($AlreadyWorkGroup -eq $True) {
-                    Out-Null;
-                }
-                if ($NoDomainAssignWorkgroup -eq $False) {
-                    Add-Computer -WorkgroupName "Workgroup" | Start-Sleep -Seconds 5; Restart-Computer;
-                }
+# Adding computer to Workgroup
+    if ($IfShouldJoinDomain -eq 'n') {
+        $NoDomainAssignWorkgroup = 'WORKGROUP'
+            if ($AlreadyWorkGroup -eq $True) {
+                Out-Null;
+            }
+            if ($NoDomainAssignWorkgroup -eq $False) {
+                $GetComputer= Get-ComputerName
+                Add-Computer -WorkgroupName $GetComputer  | Start-Sleep -Seconds 5; Restart-Computer;
+            }
+    }
 
-        }
-    
 
-# Specify the trigger settings
-    $Trigger= New-JobTrigger -AtStartup -RandomDelay 00:00:15
-# Specify the account to run the script
-    $User= "NT AUTHORITY\SYSTEM"
-    $Path = Get-Location
-# Specify what program to run and with its parameters
-    $Action= New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument $Path
-# Specify the name of the task
-    Register-ScheduledTask -TaskName "Continiued Powershell Formatting Script" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest -Force 
-
-Finally {
-    $Time=Get-Date
-    Write-Host "Script have successfully installed all programs at $Time" | Out-File $env:USERPROFILE\logs\FormattingScript.log -Append
-}
+# Finally {
+#     $Time= Get-Date
+#     Write-Host "Script have successfully installed all programs at $Time" | Out-File $env:USERPROFILE\logs\FormattingScript.log -Append
+# }
 
 Read-Host "Press any key to continue" | Out-Null
