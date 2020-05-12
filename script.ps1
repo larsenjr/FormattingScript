@@ -41,6 +41,7 @@ $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).gr
         Start-Sleep -Seconds 2
         Start-Process powershell_ise -Verb runAs
     }
+
 ## .bat
     if ($isAdmin -eq $True) {
         $RunBat = .\executionPolicy.bat 
@@ -49,7 +50,7 @@ $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).gr
         Write-Output "Setting ExecutionPolicy to Bypass"
     }
 
-## Functions
+# Functions
 
     # Get the timestamp. Used to track error-messages
     function Get-TimeStamp {
@@ -418,25 +419,25 @@ Write-Host "Removing Windows Bloatware." -ForegroundColor Yellow
     }
     
 # Prompt for new ComputerName
-$NewComputerName = Read-Host -Prompt "Enter New Computer name: "
-Write-Host "Changing name.." -ForegroundColor Yellow | Rename-Computer -NewName $NewComputerName
+    $NewComputerName = Read-Host -Prompt "Enter New Computer name: "
+    Write-Host "Changing name.." -ForegroundColor Yellow | Rename-Computer -NewName $NewComputerName
 
-Write-host "$env:COMPUTERNAME needs to be restarted. Do you want to do it now?" -ForegroundColor Yellow
+    Write-host "$env:COMPUTERNAME needs to be restarted. Do you want to do it now?" -ForegroundColor Yellow
 
-$Path = Get-Location
-$Action= New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "$env:USERPROFILE\script.ps1"
-$TaskTrigger = New-ScheduledTaskTrigger -AtLogon -RunOnce
-$TaskUser = New-ScheduledTaskPrincipal "$env:USERPROFILE"
-$TaskSettingSet = New-ScheduledTaskSettingsSet
-$NewTask = New-ScheduledTask -Action $Action -Principal $TaskUser -Trigger $TaskTrigger -Settings $TaskSettingSet
+# Scheduled Task
+    $Path = Get-Location
+    $Action= New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "$env:USERPROFILE\script.ps1"
+    $TaskTrigger = New-ScheduledTaskTrigger -AtLogon -RunOnce
+    $TaskUser = New-ScheduledTaskPrincipal "$env:USERPROFILE"
+    $TaskSettingSet = New-ScheduledTaskSettingsSet
+    $NewTask = New-ScheduledTask -Action $Action -Principal $TaskUser -Trigger $TaskTrigger -Settings $TaskSettingSet
 
-$Confirmation = Read-host " ( y / n ) "
+    $Confirmation = Read-host " ( y / n ) "
 
 
     switch ($Confirmation) {
-            y {Write-Host "Your computer will be restarted in 5 seconds" -ForegroundColor Green; Register-ScheduledTask Script.ps1 -InputObject $NewTask;Start-Sleep 5; Restart-Computer}
+            y {Write-Host "Your computer will be restarted in 5 seconds" -ForegroundColor Green; Register-ScheduledTask Script.ps1 -InputObject $NewTask; Start-Sleep 5; Restart-Computer}
             n {Write-Host "You have to manually restart $env:COMPUTERNAME by yourself for the changes to take effect" -ForegroundColor Red; Exit;}
-            
         }
 
     if($Confirmation -eq 'yes') {
@@ -449,16 +450,17 @@ $Confirmation = Read-host " ( y / n ) "
 
 
 # Domain Join
-$IfShouldJoinDomain = Read-Host -Prompt "Should the computer join a domain? "
+    $IfShouldJoinDomain = Read-Host -Prompt "Should the computer join a domain? "
 # Adding machine to Domain
     if ($IfShouldJoinDomain -eq 'y') {
-        $WriteDomain = Read-Host -Prompt "Specify your domain name"
+        $WriteDomain = Read-Host -Prompt "Specify your domain name (*domain*\*user*)"
         Add-Computer -DomainName $WriteDomain
     }
 
 # Adding computer to Workgroup
     if ($IfShouldJoinDomain -eq 'n') {
         $NoDomainAssignWorkgroup = 'WORKGROUP'
+
             if ($AlreadyWorkGroup -eq $True) {
                 Out-Null;
             }
@@ -468,10 +470,4 @@ $IfShouldJoinDomain = Read-Host -Prompt "Should the computer join a domain? "
             }
     }
 
-
-# Finally {
-#     $Time= Get-Date
-#     Write-Host "Script have successfully installed all programs at $Time" | Out-File $env:USERPROFILE\logs\FormattingScript.log -Append
-# }
-
-Read-Host "Press any key to continue" | Out-Null
+    Read-Host "Press any key to continue" | Out-Null
