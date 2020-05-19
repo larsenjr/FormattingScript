@@ -26,7 +26,6 @@
     $PuttyPath = "C:\Program Files\PuTTY\putty.exe"
     $OpenSSHPath = "C:\Program Files\OpenSSH-Win64\ssh.exe"
     $Python3Path = "C:\Program Files (x86)\Microsoft Visual Studio\Shared\Python37_64\python.exe"
-    $JavaPath = "C:\Program Files\Java\jdk-13.0.1\bin\java.exe"
     $Php7Path = "C:\Tools\php74\php.exe"
     $DockerPath = "C:\Program Files\Docker\Docker\Docker Desktop.exe"
     $OpenVPNPath ="C:\Program Files\OpenVPN\bin\openvpn-gui.exe"
@@ -91,7 +90,8 @@ $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).gr
         "python3",
         "php",
         "docker-cli",
-        "openvpn" 
+        "openvpn",
+        "google-backup-and-sync"
     )
 
     foreach ($Program in $InstalledPrograms) {
@@ -112,7 +112,6 @@ $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).gr
     Write-Output "Checking updates" | Green
         choco update all -a
 
-
 ## Checking upgrades.
 
     Write-Output "Checking Upgrades" | Green
@@ -120,38 +119,48 @@ $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).gr
         
 # Removes Windows default programs
 
+
     Write-Host "Removing Windows Bloatware." -ForegroundColor Yellow
-        $AppList = 
-            "*3DBuilder*",
-            "*Getstarted*",
-            "*WindowsAlarms*",
-            "*WindowsCamera*",
-            "*bing*",
-            "*MicrosoftOfficeHub*",
-            "*OneNote*",
-            "*people*",
-            "*WindowsPhone*",
-            "*photos*",
-            "*SkypeApp*",
-            "*solit*",
-            "*WindowsSoundRecorder*",
-            "*windowscommunicationsapps*",
-            "*zune*",
-            "*WindowsMaps*",
-            "*Sway*",
-            "*CommsPhone*",
-            "*ConnectivityStore*",
-            "*Microsoft.Messaging*",
-            "*Facebook*",
-            "*Twitter*",
-            "*Drawboard PDF*"
+        $AppList = @(
+    "Microsoft.3DBuilder",
+    "Microsoft.Appconnector",
+    "Microsoft.BingFinance",
+    "Microsoft.BingNews",
+    "Microsoft.BingSports",
+    "Microsoft.BingTranslator",
+    "Microsoft.BingWeather",
+    "Microsoft.GamingServices",
+    "Microsoft.Microsoft3DViewer",
+    "Microsoft.MicrosoftOfficeHub",
+    "Microsoft.MicrosoftPowerBIForWindows",
+    "Microsoft.MicrosoftSolitaireCollection",
+    "Microsoft.MinecraftUWP",
+    "Microsoft.NetworkSpeedTest",
+    "Microsoft.Office.OneNote",
+    "Microsoft.People",
+    "Microsoft.Print3D",
+    "Microsoft.SkypeApp",
+    "Microsoft.Wallet",
+    "Microsoft.WindowsAlarms",
+    "Microsoft.WindowsCamera",
+    "microsoft.windowscommunicationsapps",
+    "Microsoft.WindowsMaps",
+    "Microsoft.WindowsPhone",
+    "Microsoft.WindowsSoundRecorder",
+    "Microsoft.Xbox.TCUI",
+    "Microsoft.XboxApp",
+    "Microsoft.XboxSpeechToTextOverlay",
+    "Microsoft.YourPhone",
+    "Microsoft.ZuneMusic",
+    "Microsoft.ZuneVideo"
+    )
 
     ForEach ($App in $AppList) {
         $AppPackageFullName = (Get-AppxPackage $App).PackageFullName
 
         if ($AppPackageFullName) {
             Write-Host "Removing Package: $App"
-            Remove-AppxPackage -package $PackageFullName
+            Remove-AppxPackage -package $PackageFullName -AllUsers
         }
         else {
             Write-host "Unable to find package: $App"
@@ -208,6 +217,17 @@ $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).gr
                 $GetComputer= Get-ComputerName
                 Add-Computer -WorkgroupName $GetComputer  | Start-Sleep -Seconds 5; Restart-Computer;
             }
+    }
+
+    $PartitionDisk = Get-Disk | Where PartitionStyle -eq 'raw'
+
+# Adding the other disk drives
+    if ($PartitionDisk -eq $true) {
+        Initialize-disk -PartitionStyle "MBR" -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize |
+        Format-Volume -FileSystem NTFS -NewFileSystemLabel "Disk2" -Confirm:$true | Set-disk -Number 2 -IsReadOnly $False -AsJob
+    }
+    else {
+        Continue;
     }
 
     Read-Host "Press any key to continue" | Out-Null
