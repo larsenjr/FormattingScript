@@ -222,8 +222,10 @@ $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).gr
     $DesktopShortcut = Get-ChildItem $DesktopFolder
 
     foreach ($item in $DesktopShortcut) {
-        Get-ChildItem $env:USERPROFILE\Desktop\*.lnk
+        Get-ChildItem "$env:USERPROFILE\Desktop\*.lnk"
         ForEach-Object { Remove-Item $_ }
+        #Remove-Item -Path "$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\*" -Recurse -WhatIf
+        #Remove-Item -Path "$env:USERPROFILE\Desktop\*.lnk" -WhatIf
     }
 
 # Adding the other disk drives
