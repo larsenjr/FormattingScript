@@ -1,4 +1,4 @@
-#Requires -RunAsAdministrator
+
 # Install script for formatting PC
 # April 2020
 # Stian Larsen
@@ -38,13 +38,14 @@ $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).gr
     if ($isAdmin -eq $False) {
         Write-Host "You need to start this script as admin!" "`n"
         Start-Sleep -Seconds 2
-        Start-Process powershell_ise -Verb runAs
+        $InstallationPath = Get-Location
+        Start-Process powershell -Verb runAs
     }
 
 ## .bat script for running ExecutionPolicy
     if ($isAdmin -eq $True) {
         $RunBat = .\executionPolicy.bat 
-        $UserCredentidals = "NT AUTHORITY\SYSTEM"
+        $UserCredentidals = $ENV:USERPROFILE
         Start-Process 'cmd.exe' -Credential $UserCredentidals -ArgumentList "/c $RunBat"
         Write-Output "Setting ExecutionPolicy to Bypass"
     }
@@ -96,7 +97,7 @@ $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).gr
 
     foreach ($Program in $InstalledPrograms) {
         Write-Verbose "Installing $InstalledPrograms" | Green
-            choco install $InstalledPrograms -y --verbose | Out-file "C:\logs\chocolatey\$InstalledPrograms.log"
+            choco install $InstalledPrograms -y --verbose | Out-file "C:\logs\chocolatey\installed$Get-Date.log"
 
         if ((Test-path $InstalledPrograms) -eq $True) {
             Write-Output "$InstalledPrograms successfully installed! Continuing installation.." | Green
@@ -104,6 +105,7 @@ $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).gr
 
         else {
             Write-Output "$(Get-TimeStamp)"
+            Out-Null;
         }
     }
 
@@ -118,7 +120,6 @@ $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).gr
         choco upgrade all -a
         
 # Removes Windows default programs
-
 
     Write-Host "Removing Windows Bloatware." -ForegroundColor Yellow
         $AppList = @(
