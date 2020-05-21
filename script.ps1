@@ -197,7 +197,6 @@ $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).gr
         Out-Null;
     }
 
-
 # Domain Join
     $IfShouldJoinDomain = Read-Host -Prompt "Should the computer join a domain? "
 # Adding machine to Domain
@@ -218,10 +217,18 @@ $isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).gr
                 Add-Computer -WorkgroupName $GetComputer  | Start-Sleep -Seconds 5; Restart-Computer;
             }
     }
+    # Removes shortcuts on desktops
+    $DesktopFolder = (Get-ItemProperty"HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders").Desktop
+    $DesktopShortcut = Get-ChildItem $DesktopFolder
 
-    $PartitionDisk = Get-Disk | Where PartitionStyle -eq 'raw'
+    foreach ($item in $DesktopShortcut) {
+        Get-ChildItem $env:USERPROFILE\Desktop\*.lnk
+        ForEach-Object { Remove-Item $_ }
+    }
 
 # Adding the other disk drives
+$PartitionDisk = Get-Disk | Where PartitionStyle -eq 'raw'
+
     if ($PartitionDisk -eq $true) {
         Initialize-disk -PartitionStyle "MBR" -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize |
         Format-Volume -FileSystem NTFS -NewFileSystemLabel "Disk2" -Confirm:$true | Set-disk -Number 2 -IsReadOnly $False -AsJob
