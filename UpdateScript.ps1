@@ -5,35 +5,30 @@
 # 05.06.2020
 # Stian Larsen
 
-$isAdmin = [bool](([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match "S-1-5-32-544")
+#Check that Powershell is opened in elevated mode. Opening the script in elevated mode and continiuing the script as normal.
 
-    if ($isAdmin -eq $False) {
-        Write-Host "You need to start this script as admin!" "`n"
-        $ScriptDir = Split-Path $script:MyInvocation.MyCommand.Path
-        Write-host "Your location is $ScriptDir"
-        Start-Sleep -Seconds 2
-       
-        $FilePath = Resolve-Path "UpdateScript.ps1"
+if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))  
+{  
+     Write-host "Your location is $ScriptDir"
+    $arguments = "& '" +$myinvocation.mycommand.definition + "'"
+    Start-Process powershell -Verb runAs -ArgumentList $arguments
+    Break
+}
 
-        Start-Process powershell -Verb runAs -Command Set-location $Scriptdir | Push-Location $FilePath
-
-    }
-
-    $AnswerText = "n";
-
-    if ($AnswerText -eq $True) {
-        Out-Null
-        Exit;
-    }
-Write-host "Updating applications.. Please Wait." -ForegroundColor Yellow
+try {
+    Write-host "Updating applications.. Please Wait." -ForegroundColor Yellow -ErrorAction Stop
 
     choco update all -y --verbose
 
 
-    Write-host "Upgrading applications.. Please wait" -ForegroundColor Yellow
+    Write-host "Upgrading applications.. Please wait" -ForegroundColor Yellow -ErrorAction Stop
 
     choco upgrade all -y --verbose 
-   
+}
+catch {
+    Write-Error -Message "Houston we have a problem." -ErrorAction Stop
+    Write-Output "Something threw an exception"
+}
 
    if ($UpdatedPrograms -eq $True) {
         Out-Null
