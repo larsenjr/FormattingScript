@@ -16,12 +16,12 @@ if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 }
 
 try {
-    Write-host "Updating applications.. Please Wait." -ForegroundColor Yellow -ErrorAction Stop
+    Write-host "Updating applications.. Please Wait." -ForegroundColor Yellow
 
     choco update all -y --verbose
 
 
-    Write-host "Upgrading applications.. Please wait" -ForegroundColor Yellow -ErrorAction Stop
+    Write-host "Upgrading applications.. Please wait" -ForegroundColor Yellow
 
     choco upgrade all -y --verbose 
 }

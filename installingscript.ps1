@@ -13,17 +13,17 @@ if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
   Break
 }
 # Installing main programs for me. Feel free to remove / add programs by yourself. You can find programs you want to install on chocolatey.org
-
-choco.exe install chrome
-choco.exe install firefox
-choco.exe install 7zip.install
-choco.exe install notepadplusplus.install
-choco.exe install git.install
-choco.exe install putty.install
-choco.exe install sysinternals
-choco.exe install teamviewer
-choco.exe install vscode
-choco.exe install winscp.install
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+choco.exe install chrome -y
+choco.exe install firefox -y
+choco.exe install 7zip.install -y
+choco.exe install notepadplusplus.install -y
+choco.exe install git.install -y
+choco.exe install putty.install -y
+choco.exe install sysinternals -y
+choco.exe install teamviewer -y
+choco.exe install vscode -y
+choco.exe install winscp.install -y
 
 $PSScriptRoot
 

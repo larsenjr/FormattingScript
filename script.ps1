@@ -176,8 +176,9 @@ try {
         Write-Error -Message -Exception "Could not change $env:COMPUTERNAME"
     }
 
+     #Scheduled Task
     try {
-        # Scheduled Task
+        
             $Path = Get-Location
             $Action= New-ScheduledTaskAction -Execute "Powershell.exe" -Argument "$env:USERPROFILE\script.ps1"
             $TaskTrigger = New-ScheduledTaskTrigger -AtLogon
@@ -232,19 +233,34 @@ try {
         Write-Error -Exception -ErrorAction Stop
     }
 
+    # Easy command for removing all shortcuts, links and .exe from your desktop. 
 
-    # Removes shortcuts on desktops
-    $DesktopFolder = (Get-ItemProperty"HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders").Desktop
-    $DesktopShortcut = Get-ChildItem $DesktopFolder
-
-    foreach ($item in $DesktopShortcut) {
-        Get-ChildItem "$env:USERPROFILE\Desktop\*.lnk"
-        ForEach-Object { Remove-Item $_ }
-        #Remove-Item -Path "$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\*" -Recurse -WhatIf
-        #Remove-Item -Path "$env:USERPROFILE\Desktop\*.lnk" -WhatIf
+    try {
+        $DesktopFolder = (Get-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders").Desktop
+        $DesktopShortcuts = Get-ChildItem $DesktopFolder
+    
+        foreach ($item in $DesktopShortcuts) {
+            if ($item -match "$_.lnk") {
+                Remove-item $item.FullName
+                Write-Output "$item link shortcut in $DesktopFolder removed"
+            }
+            elseif ($item -match "$_.url") {
+                Remove-item $item.FullName
+                Write-Output "$item url shortcut in $DesktopFolder removed"
+            }
+            elseif ($item -match "$_.exe") {
+                Remove-item $item.FullName
+                Write-Output "$item url shortcut in $DesktopFolder removed"
+            }
+        }
+    }
+    catch [System.IO.FileNotFoundException], [System.IO.DirectoryNotFoundException]{
+        Write-Output "$(Get-TimeStamp) - Houston, you have a problem" 
+        
     }
 
-# Adding the other disk drives
+
+## Adding the other disk drives. this is not working properly yet!
 $PartitionDisk = Get-Disk | Where PartitionStyle -eq 'raw'
 
     if ($PartitionDisk -eq $true) {
@@ -258,4 +274,4 @@ $PartitionDisk = Get-Disk | Where PartitionStyle -eq 'raw'
     Read-Host "Press any key to continue" | Out-Null
 
 
-    
+   
