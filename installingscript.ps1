@@ -23,7 +23,14 @@ $installed_programs = @(
   "putty.install",
   "teamviewer",
   "vscode",
-  "winscp,install"
+  "winscp,install",
+  "bitwarden",
+  "docker-cli",
+  "mobaxterm",
+  "sublimetext3",
+  "spotify",
+  "sharex",
+  "vlc"
 )
 
 
