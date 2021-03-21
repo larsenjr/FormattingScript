@@ -32,6 +32,7 @@ catch {
 
    if ($UpdatedPrograms -eq $True) {
         Out-Null
+        Write-Output "Updated programs successfully"
    }
 
-   Read-host -Prompt "Press Enter to Exit"
+   Read-host -Prompt "Press Enter to Exit."
