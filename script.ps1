@@ -169,6 +169,8 @@ try {
     Write-Host "Changing name.." -ForegroundColor Yellow | Rename-Computer -NewName $NewComputerName
 
     Write-host "$env:COMPUTERNAME needs to be restarted. Do you want to do it now?" -ForegroundColor Yellow
+
+    ##TODO
 }
 catch {
     Write-Output "$(Get-TimeStamp) - Houston, you have a problem"
@@ -185,7 +187,7 @@ Register-ScheduledJob –Name ”Continiuing PowerShellScript” -Task $task
 
 $Trigger = New-ScheduledTaskTrigger -At 10:00am –Daily # Specify the trigger settings
 $User = "NT AUTHORITY\SYSTEM" # Specify the account to run the script
-$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "C:\PS\StartupScript.ps1" # Specify what program to run and with its parameters
+$Action = New-ScheduledTaskAction -Execute "PowerShell.exe" -Argument "B:\Projects\FormattingScript\script.ps1" # Specify what program to run and with its parameters
 Register-ScheduledTask -TaskName "PowerShellScript" -Trigger $Trigger -User $User -Action $Action -RunLevel Highest –Force # Specify the name of the task
 try {
         
@@ -199,7 +201,7 @@ try {
     $Confirmation = Read-host " ( y / n ) "
 
     switch ($Confirmation) {
-        y { Write-Host "Your computer will be restarted in 5 seconds" -ForegroundColor Green; Register-ScheduledTask Script.ps1 -InputObject $NewTask; Start-Sleep 5; Restart-Computer }
+        y { Write-Host "Your computer will be restarted in 5 seconds" Register-ScheduledTask Script.ps1 -InputObject $NewTask; Start-Sleep 5; Restart-Computer }
         n { Write-Host "You have to manually restart $env:COMPUTERNAME by yourself for the changes to take effect" -ForegroundColor Red; Exit; }
     }
 
@@ -233,7 +235,7 @@ try {
             }
             if ($NoDomainAssignWorkgroup -eq $False) {
                 $GetComputer = Get-ComputerName
-                Add-Computer -WorkgroupName $GetComputer  | Start-Sleep -Seconds 5; Restart-Computer;
+                Add-Computer -WorkgroupName $GetComputer | Out-Null
             }
         }
     }
@@ -243,45 +245,18 @@ catch {
     Write-Error -Exception -ErrorAction Stop
 }
 
-# Easy command for removing all shortcuts, links and .exe from your desktop. 
-
-try {
-    $DesktopFolder = (Get-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders").Desktop
-    $DesktopShortcuts = Get-ChildItem $DesktopFolder
-    
-    foreach ($item in $DesktopShortcuts) {
-        if ($item -match "$_.lnk") {
-            Remove-item $item.FullName
-            Write-Output "$item link shortcut in $DesktopFolder removed"
-        }
-        elseif ($item -match "$_.url") {
-            Remove-item $item.FullName
-            Write-Output "$item url shortcut in $DesktopFolder removed"
-        }
-        elseif ($item -match "$_.exe") {
-            Remove-item $item.FullName
-            Write-Output "$item url shortcut in $DesktopFolder removed"
-        }
-    }
-}
-catch [System.IO.FileNotFoundException], [System.IO.DirectoryNotFoundException] {
-    Write-Output "$(Get-TimeStamp) - Houston, you have a problem" 
-        
-}
-
 
 ## Adding the other disk drives. this is not working properly yet!
-$PartitionDisk = Get-Disk | Where PartitionStyle -eq 'raw'
-
-if ($PartitionDisk -eq $true) {
-    Initialize-disk -PartitionStyle "MBR" -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize |
-    Format-Volume -FileSystem NTFS -NewFileSystemLabel "Disk2" -Confirm:$true | Set-disk -Number 2 -IsReadOnly $False -AsJob
-}
-else {
-    Continue;
-}
+## $PartitionDisk = Get-Disk | Where PartitionStyle -eq 'raw'
+## 
+## if ($PartitionDisk -eq $true) {
+##     Initialize-disk -PartitionStyle "MBR" -PassThru | New-Partition -AssignDriveLetter -UseMaximumSize |
+##     Format-Volume -FileSystem NTFS -NewFileSystemLabel "Disk2" -Confirm:$true | Set-disk -Number 2 -IsReadOnly $False -AsJob
+## }
+## else {
+##     Continue;
+## }
+## 
 
 Read-Host "Press any key to continue" | Out-Null
 
-
-   
