@@ -9,4 +9,5 @@ Powershell need to be in elevated mode to work!
 If you want other programs you have to search for it <a href="https://chocolatey.org/packages"> here</a>
 
 
-vi kjører en ny test vi
+
+
