@@ -32,7 +32,9 @@ if ($UpdatedPrograms -eq $True) {
 
 try {
     $DesktopFolder = (Get-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders").Desktop
+    $DesktopFolder2 = (Get-ItemProperty "C:\Users\Public\Desktop").Desktop
     $DesktopShortcuts = Get-ChildItem $DesktopFolder
+    $DesktopShortcuts2 = Get-ChildItem $DesktopFolder2
 
     foreach ($Shortcut in $DesktopShortcuts) {
         if ($Shortcut -match "$_.lnk") {
