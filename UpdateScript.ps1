@@ -23,7 +23,7 @@ catch {
         Write-Output "Something threw an exception"
     }
 
-   if ($UpdatedPrograms -eq $True) {
+if ($UpdatedPrograms -eq $True) {
         Out-Null
         Write-Output "Updated programs successfully"
    }
@@ -33,21 +33,22 @@ catch {
 try {
     $DesktopFolder = (Get-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders").Desktop
     $DesktopShortcuts = Get-ChildItem $DesktopFolder
-    
+
     foreach ($Shortcut in $DesktopShortcuts) {
         if ($Shortcut -match "$_.lnk") {
-            Remove-item $item.FullName
-            Write-Output "$item link shortcut in $DesktopFolder removed"
-        }
+                Remove-item $Shortcut.FullName
+                Write-Output "$Shortcut link shortcut in $DesktopFolder removed"
+            }
         elseif ($Shortcut -match "$_.url") {
-            Remove-item $item.FullName
-            Write-Output "$item url shortcut in $DesktopFolder removed"
-        }
+                Remove-item $Shortcut.FullName
+                Write-Output "$Shortcut url shortcut in $DesktopFolder removed"
+            }
         elseif ($Shortcut -match "$_.exe") {
-            Remove-item $item.FullName
-            Write-Output "$item url shortcut in $DesktopFolder removed"
-        }
+            Remove-item $Shortcut.FullName
+            Write-Output "$Shortcut exe shortcut in $DesktopFolder removed"
+            }
     }
+        
 }
 
 catch [System.IO.FileNotFoundException], [System.IO.DirectoryNotFoundException] {
