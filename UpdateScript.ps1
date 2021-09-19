@@ -2,11 +2,18 @@
 
 
 if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))  {  
-        Write-host "Your location is $ScriptDir"
         $arguments = "& '" +$myinvocation.mycommand.definition + "'"
         Start-Process powershell -Verb runAs -ArgumentList $arguments
         Break
     }
+
+$LogFile = "C:\Users\$env:USERPROFILE\Log\$(gc env:computername).log"
+
+function LogWriter {
+    param ([string]$logString)
+        Add-Content $LogFile -value $logString
+        
+}
 
 try {
     Write-host "Updating applications.. Please Wait." -ForegroundColor Yellow
@@ -32,9 +39,7 @@ if ($UpdatedPrograms -eq $True) {
 
 try {
     $DesktopFolder = (Get-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders").Desktop
-    $DesktopFolder2 = (Get-ItemProperty "C:\Users\Public\Desktop").Desktop
     $DesktopShortcuts = Get-ChildItem $DesktopFolder
-    $DesktopShortcuts2 = Get-ChildItem $DesktopFolder2
 
     foreach ($Shortcut in $DesktopShortcuts) {
         if ($Shortcut -match "$_.lnk") {
