@@ -110,7 +110,7 @@ powershell.exe -file "B:\Projects\FormattingScript\UpdateScript.ps1"
 
 try {
     Write-Host "Removing Windows Bloatware." -ForegroundColor Yellow
-    $AppList = @(
+    $DefaultMicrosoftAppList = @(
         "Microsoft.3DBuilder",
         "Microsoft.Appconnector",
         "Microsoft.BingFinance",
@@ -144,7 +144,7 @@ try {
         "Microsoft.ZuneVideo"
     )
 
-    ForEach ($App in $AppList) {
+    ForEach ($App in $DefaultMicrosoftAppList) {
         $AppPackageFullName = (Get-AppxPackage $App).PackageFullName
 
         if ($AppPackageFullName) {
@@ -169,6 +169,7 @@ try {
     Write-Host "Changing name.." -ForegroundColor Yellow | Rename-Computer -NewName $NewComputerName
 
     Write-host "$env:COMPUTERNAME needs to be restarted. Do you want to do it now?" -ForegroundColor Yellow
+    Checkpoint-Computer -Description "Restart PC for change name"
 
     ##TODO
 }
